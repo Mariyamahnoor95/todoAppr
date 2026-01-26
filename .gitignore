@@ -64,3 +64,51 @@ build/
 *.tmp
 *.bak
 *.swp
+
+# ============================================
+# Monorepo Phase II Additions
+# ============================================
+
+# Node.js / Next.js (Frontend)
+node_modules/
+.next/
+out/
+.turbo
+*.tsbuildinfo
+next-env.d.ts
+
+# Package manager locks (keep in version control but ignore local modifications)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# Environment variables (monorepo)
+backend/.env
+backend/.env.local
+frontend/.env
+frontend/.env.local
+.env.*.local
+
+# Docker
+docker-compose.override.yml
+*.dockerfile.bak
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+postgres_data/
+
+# Coverage reports (backend and frontend)
+backend/htmlcov/
+backend/.coverage
+frontend/coverage/
+
+# Build artifacts
+backend/build/
+backend/dist/
+frontend/build/
+frontend/dist/
+
+# Alembic
+backend/alembic.ini.bak
