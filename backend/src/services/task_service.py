@@ -9,7 +9,7 @@ from datetime import datetime
 from typing import Optional
 from uuid import UUID
 
-from sqlmodel import Session, select, func
+from sqlmodel import Session, func, select
 
 from ..models.task import Task
 
@@ -37,7 +37,7 @@ class TaskService:
     def get_tasks(
         self,
         session: Session,
-        user_id: UUID,
+        user_id: str,
         skip: int = 0,
         limit: int = 100,
         completed: Optional[bool] = None,
@@ -64,7 +64,7 @@ class TaskService:
 
         return list(session.exec(query).all())
 
-    def get_task_by_id(self, session: Session, task_id: UUID, user_id: UUID) -> Task:
+    def get_task_by_id(self, session: Session, task_id: UUID, user_id: str) -> Task:
         """
         Get a single task by ID with user ownership verification.
 
@@ -89,7 +89,7 @@ class TaskService:
     def create_task(
         self,
         session: Session,
-        user_id: UUID,
+        user_id: str,
         title: str,
         description: Optional[str] = None,
     ) -> Task:
@@ -141,7 +141,7 @@ class TaskService:
         self,
         session: Session,
         task_id: UUID,
-        user_id: UUID,
+        user_id: str,
         title: Optional[str] = None,
         description: Optional[str] = None,
         completed: Optional[bool] = None,
@@ -195,7 +195,7 @@ class TaskService:
 
         return task
 
-    def toggle_completion(self, session: Session, task_id: UUID, user_id: UUID) -> Task:
+    def toggle_completion(self, session: Session, task_id: UUID, user_id: str) -> Task:
         """
         Toggle task completion status.
 
@@ -220,7 +220,7 @@ class TaskService:
 
         return task
 
-    def delete_task(self, session: Session, task_id: UUID, user_id: UUID) -> None:
+    def delete_task(self, session: Session, task_id: UUID, user_id: str) -> None:
         """
         Delete a task.
 
@@ -238,7 +238,7 @@ class TaskService:
         session.commit()
 
     def get_task_count(
-        self, session: Session, user_id: UUID, completed: Optional[bool] = None
+        self, session: Session, user_id: str, completed: Optional[bool] = None
     ) -> int:
         """
         Get total count of tasks for a user.

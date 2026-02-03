@@ -9,7 +9,7 @@ from datetime import datetime
 from typing import Optional
 from uuid import UUID, uuid4
 
-from sqlmodel import Field, Relationship, SQLModel
+from sqlmodel import Field, SQLModel
 
 
 class Task(SQLModel, table=True):
@@ -18,7 +18,7 @@ class Task(SQLModel, table=True):
 
     Attributes:
         id: Unique task identifier (UUID)
-        user_id: Foreign key to User who owns this task
+        user_id: Better Auth user ID (string)
         title: Task title (1-200 characters, required)
         description: Optional task description (max 1000 characters)
         completed: Completion status (default False)
@@ -29,7 +29,7 @@ class Task(SQLModel, table=True):
     __tablename__ = "tasks"
 
     id: Optional[UUID] = Field(default_factory=uuid4, primary_key=True)
-    user_id: UUID = Field(foreign_key="users.id", nullable=False, index=True)
+    user_id: str = Field(nullable=False, index=True)
     title: str = Field(min_length=1, max_length=200)
     description: Optional[str] = Field(default=None, max_length=1000)
     completed: bool = Field(default=False)

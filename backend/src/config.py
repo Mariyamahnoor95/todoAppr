@@ -23,10 +23,8 @@ class Settings(BaseSettings):
     # Database
     database_url: str = "postgresql://todouser:todopass@localhost:5432/tododb"
 
-    # JWT Authentication
-    jwt_secret: str = "CHANGE_ME_IN_PRODUCTION"
-    jwt_algorithm: str = "HS256"
-    jwt_access_token_expire_days: int = 7
+    # Better Auth JWT Validation
+    better_auth_secret: str = "CHANGE_ME_IN_PRODUCTION"
 
     # CORS
     cors_origins: list[str] = ["http://localhost:3000"]
@@ -34,7 +32,7 @@ class Settings(BaseSettings):
     # Application
     environment: Literal["development", "production", "test"] = "development"
     frontend_url: str = "http://localhost:3000"
-    api_prefix: str = "/api/v1"
+    api_prefix: str = "/api"
 
     # Server
     host: str = "0.0.0.0"

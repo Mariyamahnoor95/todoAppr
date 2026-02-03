@@ -2,14 +2,16 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { authApi, ApiError } from "@/lib/api";
+import { authClient } from "@/lib/auth-client";
 import { useAuthStore } from "@/lib/store";
+import { ApiError } from "@/lib/api";
 
 /**
  * Authentication hook for managing user authentication state.
  *
  * Provides methods for login, register, logout and accessing current user.
  * Automatically syncs with Zustand store and handles routing.
+ * Now uses Better Auth for authentication.
  *
  * @example
  * ```tsx
@@ -26,19 +28,42 @@ import { useAuthStore } from "@/lib/store";
  */
 export function useAuth() {
   const router = useRouter();
-  const { user, isAuthenticated, setUser, logout: clearUser } = useAuthStore();
+  const { user, isAuthenticated, setUser, setToken, logout: clearUser } = useAuthStore();
 
   /**
-   * Check if user is authenticated on mount
+   * Fetch JWT token from Better Auth and store it
+   */
+  const fetchAndStoreToken = async () => {
+    try {
+      const { data } = await authClient.token();
+      if (data?.token) {
+        setToken(data.token);
+      }
+    } catch {
+      // Token fetch failed, will retry on next request
+    }
+  };
+
+  /**
+   * Check if user is authenticated on mount using Better Auth session
    */
   useEffect(() => {
     const checkAuth = async () => {
       if (!user) {
         try {
-          const currentUser = await authApi.me();
-          setUser(currentUser);
-        } catch (error) {
-          // Not authenticated, clear any stale state
+          const { data: session } = await authClient.getSession();
+          if (session?.user) {
+            setUser({
+              id: session.user.id,
+              email: session.user.email,
+              created_at: session.user.createdAt,
+            });
+            // Fetch JWT token for backend API calls
+            await fetchAndStoreToken();
+          } else {
+            clearUser();
+          }
+        } catch {
           clearUser();
         }
       }
@@ -48,16 +73,30 @@ export function useAuth() {
   }, [user, setUser, clearUser]);
 
   /**
-   * Register a new user account
-   * @param email - User's email address
-   * @param password - User's password
-   * @throws ApiError if registration fails
+   * Register a new user account using Better Auth
    */
   const register = async (email: string, password: string): Promise<void> => {
     try {
-      const response = await authApi.register(email, password);
-      setUser(response.user);
-      router.push("/dashboard");
+      const { data, error } = await authClient.signUp.email({
+        email,
+        password,
+        name: email.split("@")[0],
+      });
+
+      if (error) {
+        throw new ApiError(400, error.message || "Registration failed");
+      }
+
+      if (data?.user) {
+        setUser({
+          id: data.user.id,
+          email: data.user.email,
+          created_at: data.user.createdAt,
+        });
+        // Fetch JWT token for backend API calls
+        await fetchAndStoreToken();
+        router.push("/dashboard");
+      }
     } catch (error) {
       if (error instanceof ApiError) {
         throw error;
@@ -67,16 +106,29 @@ export function useAuth() {
   };
 
   /**
-   * Login with email and password
-   * @param email - User's email address
-   * @param password - User's password
-   * @throws ApiError if login fails
+   * Login with email and password using Better Auth
    */
   const login = async (email: string, password: string): Promise<void> => {
     try {
-      const response = await authApi.login(email, password);
-      setUser(response.user);
-      router.push("/dashboard");
+      const { data, error } = await authClient.signIn.email({
+        email,
+        password,
+      });
+
+      if (error) {
+        throw new ApiError(401, error.message || "Login failed");
+      }
+
+      if (data?.user) {
+        setUser({
+          id: data.user.id,
+          email: data.user.email,
+          created_at: data.user.createdAt,
+        });
+        // Fetch JWT token for backend API calls
+        await fetchAndStoreToken();
+        router.push("/dashboard");
+      }
     } catch (error) {
       if (error instanceof ApiError) {
         throw error;
@@ -90,11 +142,10 @@ export function useAuth() {
    */
   const logout = async (): Promise<void> => {
     try {
-      await authApi.logout();
+      await authClient.signOut();
       clearUser();
       router.push("/");
-    } catch (error) {
-      // Clear local state even if API call fails
+    } catch {
       clearUser();
       router.push("/");
     }

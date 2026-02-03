@@ -40,7 +40,8 @@ async def health_check() -> dict[str, str]:
 
 
 # Include API routers
-from .api import auth, tasks
+# Note: Authentication is handled by Better Auth in the Next.js frontend
+# This backend only provides task management endpoints
+from .api import tasks
 
-app.include_router(auth.router, prefix=settings.api_prefix)
 app.include_router(tasks.router, prefix=settings.api_prefix)

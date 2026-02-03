@@ -173,7 +173,7 @@ class TaskResponse(BaseModel):
     """Response schema for task data."""
 
     id: UUID = Field(..., description="Task unique identifier")
-    user_id: UUID = Field(..., description="Owner user ID")
+    user_id: str = Field(..., description="Owner user ID")
     title: str = Field(..., description="Task title")
     description: str | None = Field(None, description="Task description")
     completed: bool = Field(..., description="Completion status")

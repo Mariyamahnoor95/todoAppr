@@ -3,57 +3,45 @@ API dependencies for dependency injection.
 
 Provides common dependencies used across API routes:
 - Database session
-- Current authenticated user
-- Authorization checks
+- Current authenticated user (via Better Auth JWT)
 """
 
 from typing import Annotated
-from uuid import UUID
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Request, status
 from sqlmodel import Session
 
 from ..db import get_session
-from ..middleware import require_auth
-from ..models.user import User
+from ..middleware import get_user_from_better_auth_token
 
 # Database session dependency
 SessionDep = Annotated[Session, Depends(get_session)]
 
-# User ID from JWT token (requires authentication)
-UserIdDep = Annotated[UUID, Depends(require_auth)]
 
-
-def get_current_user(
-    user_id: UserIdDep,
-    session: SessionDep,
-) -> User:
+def require_better_auth(request: Request) -> str:
     """
-    Get the current authenticated user from JWT token.
-
-    Extracts user ID from JWT token cookie, then fetches full User
-    object from database.
+    Require Better Auth JWT token and return user ID.
 
     Args:
-        user_id: User ID extracted from JWT token
-        session: Database session
+        request: FastAPI request object
 
     Returns:
-        User object for authenticated user
+        User ID string from Better Auth JWT token
 
     Raises:
-        HTTPException 401: If authentication fails or user not found
+        HTTPException 401: If not authenticated
     """
-    user = session.get(User, user_id)
+    user_id = get_user_from_better_auth_token(request)
 
-    if not user:
+    if not user_id:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User not found",
+            detail="Not authenticated",
+            headers={"WWW-Authenticate": "Bearer"},
         )
 
-    return user
+    return user_id
 
 
-# Current user dependency
-CurrentUserDep = Annotated[User, Depends(get_current_user)]
+# User ID from Better Auth JWT token (requires authentication)
+UserIdDep = Annotated[str, Depends(require_better_auth)]
