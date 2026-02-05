@@ -1,26 +1,29 @@
 <!--
 SYNC IMPACT REPORT
 ==================
-Version Change: [Template] → 1.0.0
-Modified Principles: Full initial constitution created
+Version Change: 1.0.0 → 1.1.0
+Modified Principles: None (all principles retained)
 Added Sections:
-  - Mission Statement
-  - Nine Pillars of AI-Driven Development
-  - Technical Standards (Python, Frontend, Database)
-  - SDD Protocol
-  - Infrastructure & Cloud Standards
-  - Architectural Patterns
-  - Quality Standards
-  - Phase-Specific Governance
+  - Phase III expanded with MCP architecture details
+  - Conversation persistence model
+  - Stateless service validation requirements
+  - OpenAI Agents SDK integration patterns
+  - ChatKit UI specifications
+Modified Sections:
+  - Phase III: AI Chatbot (comprehensive rewrite with PDF requirements)
+  - Tech Stack: Added OpenAI Agents SDK, Official MCP SDK, OpenAI ChatKit
+  - Architectural Patterns: Expanded MCP Pattern section
+  - Database Standards: Added Conversation/Message models for Phase III
+Removed Sections: None
 
 Templates Requiring Updates:
-  ✅ Constitution created from template
-  ⚠ plan-template.md - Review for alignment with principles
-  ⚠ spec-template.md - Review for alignment with SDD protocol
-  ⚠ tasks-template.md - Review for alignment with quality standards
+  ✅ Constitution updated to v1.1.0
+  ⚠ plan-template.md - Review for MCP tools alignment
+  ⚠ spec-template.md - Review for chatbot user stories
+  ⚠ tasks-template.md - Review for AI agent implementation tasks
 
 Follow-up TODOs: None - All placeholders filled
-Date: 2026-01-06
+Date: 2026-02-05
 -->
 
 # The Evolution of Todo: Spec-Driven Development & Cloud-Native AI Constitution
@@ -281,6 +284,14 @@ When conflicts arise, this hierarchy applies:
 - **Phase III+**: Qdrant for vector embeddings (optional)
 - **Phase V**: Event sourcing via Kafka topics
 
+**Phase III Database Models**:
+
+| Model | Fields | Description |
+|-------|--------|-------------|
+| Task | user_id, id, title, description, completed, created_at, updated_at | Todo items |
+| Conversation | user_id, id, created_at, updated_at | Chat session |
+| Message | user_id, id, conversation_id, role (user/assistant), content, created_at | Chat history |
+
 ---
 
 ## IV. Architectural Patterns
@@ -296,11 +307,26 @@ When conflicts arise, this hierarchy applies:
 - OpenAI Agents SDK calls MCP tools, not direct database access
 
 **Mandatory MCP Tools** (Phase III+):
-- `add_task`: Create new task
-- `list_tasks`: Retrieve tasks with filters
-- `complete_task`: Mark task complete
-- `delete_task`: Remove task
-- `update_task`: Modify task details
+
+| Tool | Purpose | Parameters | Returns |
+|------|---------|------------|---------|
+| `add_task` | Create a new task | user_id (required), title (required), description (optional) | task_id, status, title |
+| `list_tasks` | Retrieve tasks from the list | user_id (required), status (optional: "all", "pending", "completed") | Array of task objects |
+| `complete_task` | Mark a task as complete | user_id (required), task_id (required) | task_id, status, title |
+| `delete_task` | Remove a task from the list | user_id (required), task_id (required) | task_id, status, title |
+| `update_task` | Modify task title or description | user_id (required), task_id (required), title (optional), description (optional) | task_id, status, title |
+
+**Agent Behavior Specification**:
+
+| Behavior | Description |
+|----------|-------------|
+| Task Creation | When user mentions adding/creating/remembering something, use add_task |
+| Task Listing | When user asks to see/show/list tasks, use list_tasks with appropriate filter |
+| Task Completion | When user says done/complete/finished, use complete_task |
+| Task Deletion | When user says delete/remove/cancel, use delete_task |
+| Task Update | When user says change/update/rename, use update_task |
+| Confirmation | Always confirm actions with friendly response |
+| Error Handling | Gracefully handle task not found and other errors |
 
 ### Action-Server-Node Pattern
 
@@ -327,6 +353,17 @@ When conflicts arise, this hierarchy applies:
 - Horizontal scaling enabled by statelessness
 
 **Validation**: Agent must demonstrate restart resilience (server restart doesn't lose state).
+
+**Stateless Chat Request Cycle (Phase III)**:
+1. Receive user message
+2. Fetch conversation history from database
+3. Build message array for agent (history + new message)
+4. Store user message in database
+5. Run agent with MCP tools
+6. Agent invokes appropriate MCP tool(s)
+7. Store assistant response in database
+8. Return response to client
+9. Server holds NO state (ready for next request)
 
 ---
 
@@ -480,7 +517,7 @@ When conflicts arise, this hierarchy applies:
 
 ## VII. Phase-Specific Governance
 
-### Phase I: Console App (Due Dec 7, 2025)
+### Phase I: Console App (Completed)
 
 **Scope**: In-memory Python console application
 
@@ -503,7 +540,7 @@ When conflicts arise, this hierarchy applies:
 - Specs traceable to code
 - README with setup instructions
 
-### Phase II: Web Application (Due Dec 14, 2025)
+### Phase II: Web Application (Completed)
 
 **Scope**: Full-stack web app with persistent storage
 
@@ -532,27 +569,90 @@ When conflicts arise, this hierarchy applies:
 
 ### Phase III: AI Chatbot (Due Dec 21, 2025)
 
-**Scope**: Conversational AI interface for task management
+**Scope**: Conversational AI interface for task management via natural language
+
+**Objective**: Create an AI-powered chatbot interface for managing todos through natural language using MCP (Model Context Protocol) server architecture.
 
 **New Components**:
-- OpenAI ChatKit UI
-- OpenAI Agents SDK backend
-- MCP server with 5 tools
-- Stateless conversation architecture
+- OpenAI ChatKit UI (frontend chatbot interface)
+- OpenAI Agents SDK backend (AI orchestration)
+- MCP server with Official MCP SDK (5 stateless tools)
+- Stateless conversation architecture with database persistence
 
 **Architecture Requirements**:
-- Conversation state in PostgreSQL
-- MCP tools for all task operations
-- Natural language understanding
-- Stateless server (survives restarts)
+
+| Component | Technology |
+|-----------|------------|
+| Frontend | OpenAI ChatKit |
+| Backend | Python FastAPI |
+| AI Framework | OpenAI Agents SDK |
+| MCP Server | Official MCP SDK |
+| ORM | SQLModel |
+| Database | Neon Serverless PostgreSQL |
+| Authentication | Better Auth |
+
+**Chat API Endpoint**:
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | /api/{user_id}/chat | Send message & get AI response |
+
+**Request Fields**:
+- `conversation_id` (integer, optional): Existing conversation ID (creates new if not provided)
+- `message` (string, required): User's natural language message
+
+**Response Fields**:
+- `conversation_id` (integer): The conversation ID
+- `response` (string): AI assistant's response
+- `tool_calls` (array): List of MCP tools invoked
+
+**Natural Language Commands**:
+
+| User Says | Agent Should |
+|-----------|-------------|
+| "Add a task to buy groceries" | Call add_task with title "Buy groceries" |
+| "Show me all my tasks" | Call list_tasks with status "all" |
+| "What's pending?" | Call list_tasks with status "pending" |
+| "Mark task 3 as complete" | Call complete_task with task_id 3 |
+| "Delete the meeting task" | Call list_tasks first, then delete_task |
+| "Change task 1 to 'Call mom tonight'" | Call update_task with new title |
+| "I need to remember to pay bills" | Call add_task with title "Pay bills" |
+| "What have I completed?" | Call list_tasks with status "completed" |
+
+**Stateless Architecture Benefits**:
+- **Scalability**: Any server instance can handle any request
+- **Resilience**: Server restarts don't lose conversation state
+- **Horizontal scaling**: Load balancer can route to any backend
+- **Testability**: Each request is independent and reproducible
+
+**OpenAI ChatKit Domain Allowlist**:
+1. Deploy frontend first to get production URL
+2. Add domain to OpenAI's allowlist at: `https://platform.openai.com/settings/organization/security/domain-allowlist`
+3. Get domain key and configure in `NEXT_PUBLIC_OPENAI_DOMAIN_KEY`
+
+**Deliverables**:
+1. GitHub repository with:
+   - `/frontend` – ChatKit-based UI
+   - `/backend` – FastAPI + Agents SDK + MCP
+   - `/specs` – Specification files for agent and MCP tools
+   - Database migration scripts
+   - README with setup instructions
+
+2. Working chatbot that can:
+   - Manage tasks through natural language via MCP tools
+   - Maintain conversation context via database (stateless server)
+   - Provide helpful responses with action confirmations
+   - Handle errors gracefully
+   - Resume conversations after server restart
 
 **Success Criteria**:
 - Chatbot understands natural language commands
 - All 5 basic features accessible via chat
-- Conversation history persisted
-- Server statelessness validated
+- Conversation history persisted in database
+- Server statelessness validated (restart test)
+- MCP tools working correctly with OpenAI Agents SDK
 
-### Phase IV: Local Kubernetes (Due Jan 4, 2026)
+### Phase IV: Local Kubernetes Deployment (Due Jan 4, 2026)
 
 **Scope**: Containerized deployment on local K8s
 
@@ -733,14 +833,14 @@ When conflicts arise, this hierarchy applies:
 - FastAPI (Python web framework)
 - SQLModel (ORM)
 - Pydantic (data validation)
-- OpenAI Agents SDK (AI orchestration)
+- OpenAI Agents SDK (AI orchestration - Phase III+)
 
 **Frontend**:
 - Next.js 16+ (App Router)
 - React 19+
 - Tailwind CSS
 - Shadcn UI
-- OpenAI ChatKit
+- OpenAI ChatKit (Phase III+)
 
 **Database**:
 - Neon Serverless PostgreSQL
@@ -749,8 +849,9 @@ When conflicts arise, this hierarchy applies:
 **AI & Integration**:
 - Claude Code (development agent)
 - Spec-Kit Plus (SDD workflow)
-- MCP SDK (tool interface)
-- OpenAI API (chat completions)
+- Official MCP SDK (tool interface - Phase III+)
+- OpenAI Agents SDK (chat orchestration - Phase III+)
+- OpenAI API (chat completions - Phase III+)
 
 **Infrastructure**:
 - Docker (containerization)
@@ -790,7 +891,7 @@ When conflicts arise, this hierarchy applies:
 
 ---
 
-**Version**: 1.0.0 | **Ratified**: 2026-01-06 | **Last Amended**: 2026-01-06
+**Version**: 1.1.0 | **Ratified**: 2026-01-06 | **Last Amended**: 2026-02-05
 
 ---
 
