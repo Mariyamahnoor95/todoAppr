@@ -1,0 +1,344 @@
+# MCP Tools Specification for Todo AI Chatbot
+# These tools are exposed via the Official MCP SDK and called by OpenAI Agents SDK
+
+openapi: 3.1.0
+info:
+  title: Todo MCP Tools
+  description: |
+    Model Context Protocol (MCP) tools for task management.
+    These tools are invoked by the AI agent to perform CRUD operations on tasks.
+    All tools are stateless and require user_id for isolation.
+  version: 1.0.0
+
+# MCP Tool Definitions (JSON Schema format for tool registration)
+components:
+  schemas:
+    # ========================================
+    # Tool: add_task
+    # ========================================
+    AddTaskInput:
+      type: object
+      description: Create a new task for the user
+      required:
+        - user_id
+        - title
+      properties:
+        user_id:
+          type: string
+          description: The authenticated user's ID
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: Title of the task to create
+        description:
+          type: string
+          maxLength: 1000
+          default: ""
+          description: Optional description for the task
+
+    AddTaskOutput:
+      type: object
+      required:
+        - task_id
+        - status
+        - title
+      properties:
+        task_id:
+          type: string
+          format: uuid
+          description: ID of the created task
+        status:
+          type: string
+          enum: [created]
+          description: Operation status
+        title:
+          type: string
+          description: Title of the created task
+
+    # ========================================
+    # Tool: list_tasks
+    # ========================================
+    ListTasksInput:
+      type: object
+      description: Retrieve user's tasks with optional filtering
+      required:
+        - user_id
+      properties:
+        user_id:
+          type: string
+          description: The authenticated user's ID
+        status:
+          type: string
+          enum: [all, pending, completed]
+          default: all
+          description: Filter tasks by completion status
+
+    ListTasksOutput:
+      type: object
+      required:
+        - tasks
+        - count
+      properties:
+        tasks:
+          type: array
+          items:
+            $ref: '#/components/schemas/TaskSummary'
+          description: List of tasks matching the filter
+        count:
+          type: integer
+          description: Total number of tasks returned
+
+    TaskSummary:
+      type: object
+      required:
+        - id
+        - title
+        - completed
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+        completed:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+
+    # ========================================
+    # Tool: complete_task
+    # ========================================
+    CompleteTaskInput:
+      type: object
+      description: Mark a task as complete
+      required:
+        - user_id
+        - task_id
+      properties:
+        user_id:
+          type: string
+          description: The authenticated user's ID
+        task_id:
+          type: string
+          description: ID of the task to complete (UUID or numeric string)
+
+    CompleteTaskOutput:
+      type: object
+      required:
+        - task_id
+        - status
+        - title
+      properties:
+        task_id:
+          type: string
+          format: uuid
+          description: ID of the completed task
+        status:
+          type: string
+          enum: [completed]
+          description: Operation status
+        title:
+          type: string
+          description: Title of the completed task
+
+    # ========================================
+    # Tool: delete_task
+    # ========================================
+    DeleteTaskInput:
+      type: object
+      description: Delete a task from the user's list
+      required:
+        - user_id
+        - task_id
+      properties:
+        user_id:
+          type: string
+          description: The authenticated user's ID
+        task_id:
+          type: string
+          description: ID of the task to delete (UUID or numeric string)
+
+    DeleteTaskOutput:
+      type: object
+      required:
+        - task_id
+        - status
+        - title
+      properties:
+        task_id:
+          type: string
+          format: uuid
+          description: ID of the deleted task
+        status:
+          type: string
+          enum: [deleted]
+          description: Operation status
+        title:
+          type: string
+          description: Title of the deleted task
+
+    # ========================================
+    # Tool: update_task
+    # ========================================
+    UpdateTaskInput:
+      type: object
+      description: Update a task's title or description
+      required:
+        - user_id
+        - task_id
+      properties:
+        user_id:
+          type: string
+          description: The authenticated user's ID
+        task_id:
+          type: string
+          description: ID of the task to update (UUID or numeric string)
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: New title for the task (optional)
+        description:
+          type: string
+          maxLength: 1000
+          description: New description for the task (optional)
+
+    UpdateTaskOutput:
+      type: object
+      required:
+        - task_id
+        - status
+        - title
+      properties:
+        task_id:
+          type: string
+          format: uuid
+          description: ID of the updated task
+        status:
+          type: string
+          enum: [updated]
+          description: Operation status
+        title:
+          type: string
+          description: Title of the updated task (after update)
+
+    # ========================================
+    # Error Responses
+    # ========================================
+    ToolError:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          enum:
+            - task_not_found
+            - validation_error
+            - unauthorized
+            - internal_error
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        suggestion:
+          type: string
+          description: Suggested action for the user
+
+# MCP Tool Registration (for MCP SDK)
+x-mcp-tools:
+  - name: add_task
+    description: |
+      Create a new task for the user. Use this when the user mentions
+      adding, creating, remembering, or needing to do something.
+      Examples: "Add a task to buy groceries", "I need to remember to call mom"
+    inputSchema:
+      $ref: '#/components/schemas/AddTaskInput'
+    outputSchema:
+      $ref: '#/components/schemas/AddTaskOutput'
+
+  - name: list_tasks
+    description: |
+      Retrieve the user's tasks. Use this when the user wants to see,
+      show, list, or view their tasks.
+      Examples: "Show me my tasks", "What's pending?", "What have I completed?"
+    inputSchema:
+      $ref: '#/components/schemas/ListTasksInput'
+    outputSchema:
+      $ref: '#/components/schemas/ListTasksOutput'
+
+  - name: complete_task
+    description: |
+      Mark a task as complete. Use this when the user says they finished,
+      completed, or are done with a task.
+      Examples: "Mark task 3 as complete", "I finished the grocery task"
+    inputSchema:
+      $ref: '#/components/schemas/CompleteTaskInput'
+    outputSchema:
+      $ref: '#/components/schemas/CompleteTaskOutput'
+
+  - name: delete_task
+    description: |
+      Delete a task from the user's list. Use this when the user wants
+      to remove, delete, or cancel a task.
+      Examples: "Delete task 2", "Remove the meeting task"
+    inputSchema:
+      $ref: '#/components/schemas/DeleteTaskInput'
+    outputSchema:
+      $ref: '#/components/schemas/DeleteTaskOutput'
+
+  - name: update_task
+    description: |
+      Update a task's title or description. Use this when the user wants
+      to change, update, rename, or modify a task.
+      Examples: "Change task 1 to 'Buy organic groceries'", "Update the description"
+    inputSchema:
+      $ref: '#/components/schemas/UpdateTaskInput'
+    outputSchema:
+      $ref: '#/components/schemas/UpdateTaskOutput'
+
+# Agent Instructions (embedded in MCP server)
+x-agent-instructions: |
+  You are a helpful todo assistant. You help users manage their tasks through
+  natural conversation. You have access to 5 tools for task management.
+
+  ## Tool Selection Guide
+
+  | User Intent | Tool to Use | Status Filter |
+  |-------------|-------------|---------------|
+  | Add/create/remember something | add_task | - |
+  | See all tasks | list_tasks | status="all" |
+  | See pending/incomplete tasks | list_tasks | status="pending" |
+  | See completed tasks | list_tasks | status="completed" |
+  | Mark done/complete/finish | complete_task | - |
+  | Delete/remove/cancel | delete_task | - |
+  | Change/update/rename | update_task | - |
+
+  ## Response Guidelines
+
+  1. **Confirm Actions**: After performing an action, confirm what you did.
+     - "I've added 'Buy groceries' to your tasks."
+     - "Done! I've marked 'Call mom' as complete."
+     - "I've deleted 'Old meeting' from your tasks."
+
+  2. **Handle Errors**: If a task isn't found, offer alternatives.
+     - "I couldn't find task 5. Would you like to see your current tasks?"
+     - "I found multiple tasks with 'meeting'. Which one did you mean?"
+
+  3. **Be Helpful**: If the user's intent is unclear, ask for clarification.
+     - "I'm not sure which task you mean. Can you give me the task ID or title?"
+
+  4. **Format Lists**: When showing tasks, use a clear format.
+     - "Here are your tasks:\n1. Buy groceries (pending)\n2. Call mom (completed)"
+
+  ## Important Notes
+
+  - Always use the user_id provided to you (from authentication)
+  - Task IDs can be referenced by number in the list or by UUID
+  - If user says "it" or "that", refer to the most recent task discussed
+  - Never expose internal errors to users; provide friendly messages instead
