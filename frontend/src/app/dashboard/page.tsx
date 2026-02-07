@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useTasks } from "@/hooks/useTasks";
@@ -85,9 +86,17 @@ export default function DashboardPage() {
             <h1 className="text-3xl font-bold text-gray-900">My Tasks</h1>
             <p className="text-gray-600 mt-1">{user.email}</p>
           </div>
-          <Button onClick={logout} variant="outline">
-            Logout
-          </Button>
+          <div className="flex items-center gap-3">
+            <Link href="/chat">
+              <Button variant="default" className="bg-blue-600 hover:bg-blue-700">
+                <ChatIcon className="w-4 h-4 mr-2" />
+                AI Assistant
+              </Button>
+            </Link>
+            <Button onClick={logout} variant="outline">
+              Logout
+            </Button>
+          </div>
         </div>
 
         {/* Task Stats */}
@@ -176,5 +185,22 @@ export default function DashboardPage() {
         />
       </div>
     </div>
+  );
+}
+
+function ChatIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+    </svg>
   );
 }

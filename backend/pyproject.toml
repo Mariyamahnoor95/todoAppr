@@ -16,6 +16,9 @@ dependencies = [
     "pydantic-settings>=2.1.0",
     "email-validator>=2.0.0",
     "pyjwt[crypto]>=2.11.0",
+    # Phase III: AI Chatbot dependencies
+    "openai>=1.0.0",
+    "mcp>=1.0.0",
 ]
 
 [project.optional-dependencies]

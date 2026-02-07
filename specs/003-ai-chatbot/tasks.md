@@ -25,11 +25,11 @@
 
 **Purpose**: Project initialization, dependencies, and database setup
 
-- [ ] T001 Install backend dependencies (openai-agents, mcp) in backend/pyproject.toml
+- [x] T001 Install backend dependencies (openai-agents, mcp) in backend/pyproject.toml
 - [ ] T002 Install frontend dependencies (@openai/chatkit) in frontend/package.json
-- [ ] T003 [P] Add OPENAI_API_KEY and CONVERSATION_HISTORY_LIMIT to backend/.env.example
-- [ ] T004 [P] Add NEXT_PUBLIC_CHAT_API_URL to frontend/.env.example
-- [ ] T005 Create database migration script in backend/migrations/003_add_chat_tables.sql
+- [x] T003 [P] Add OPENAI_API_KEY and CONVERSATION_HISTORY_LIMIT to backend/.env.example
+- [x] T004 [P] Add NEXT_PUBLIC_CHAT_API_URL to frontend/.env.example
+- [x] T005 Create database migration script in backend/migrations/003_add_chat_tables.sql
 
 ---
 
@@ -41,30 +41,30 @@
 
 ### Data Models
 
-- [ ] T006 [P] Create Conversation SQLModel in backend/src/models/conversation.py
-- [ ] T007 [P] Create Message SQLModel with MessageRole enum in backend/src/models/message.py
-- [ ] T008 Update backend/src/models/__init__.py to export Conversation and Message
+- [x] T006 [P] Create Conversation SQLModel in backend/src/models/conversation.py
+- [x] T007 [P] Create Message SQLModel with MessageRole enum in backend/src/models/message.py
+- [x] T008 Update backend/src/models/__init__.py to export Conversation and Message
 
 ### MCP Server Infrastructure
 
-- [ ] T009 Create MCP package init in backend/src/mcp/__init__.py
-- [ ] T010 Implement MCP server setup with Official MCP SDK in backend/src/mcp/server.py
-- [ ] T011 Create MCP tools module structure in backend/src/mcp/tools.py
+- [x] T009 Create MCP package init in backend/src/mcp/__init__.py
+- [x] T010 Implement MCP server setup with Official MCP SDK in backend/src/mcp/server.py
+- [x] T011 Create MCP tools module structure in backend/src/mcp/tools.py
 
 ### Services Infrastructure
 
-- [ ] T012 Create ConversationService with CRUD operations in backend/src/services/conversation_service.py
+- [x] T012 Create ConversationService with CRUD operations in backend/src/services/conversation_service.py
 
 ### API Infrastructure
 
-- [ ] T013 Create chat request/response Pydantic schemas in backend/src/api/schemas.py (append to existing)
-- [ ] T014 Update backend/src/main.py to include new chat and conversation routes
+- [x] T013 Create chat request/response Pydantic schemas in backend/src/api/schemas.py (append to existing)
+- [x] T014 Update backend/src/main.py to include new chat and conversation routes
 
 ### Tests Infrastructure
 
-- [ ] T015 [P] Create MCP tools test file structure in backend/tests/test_mcp_tools.py
-- [ ] T016 [P] Create chat service test file structure in backend/tests/test_chat_service.py
-- [ ] T017 [P] Create chat API test file structure in backend/tests/test_chat_api.py
+- [x] T015 [P] Create MCP tools test file structure in backend/tests/test_mcp_tools.py
+- [x] T016 [P] Create chat service test file structure in backend/tests/test_chat_service.py
+- [x] T017 [P] Create chat API test file structure in backend/tests/test_chat_api.py
 
 **Checkpoint**: Foundation ready - MCP server and data models in place, user story implementation can begin
 
@@ -78,16 +78,16 @@
 
 ### Tests for User Story 1
 
-- [ ] T018 [P] [US1] Write unit test for add_task MCP tool in backend/tests/test_mcp_tools.py
-- [ ] T019 [P] [US1] Write integration test for "Add task" chat flow in backend/tests/test_chat_api.py
+- [x] T018 [P] [US1] Write unit test for add_task MCP tool in backend/tests/test_mcp_tools.py
+- [x] T019 [P] [US1] Write integration test for "Add task" chat flow in backend/tests/test_chat_api.py
 
 ### Implementation for User Story 1
 
-- [ ] T020 [US1] Implement add_task MCP tool in backend/src/mcp/tools.py
-- [ ] T021 [US1] Create ChatService with OpenAI Agents SDK integration in backend/src/services/chat_service.py
-- [ ] T022 [US1] Implement POST /api/{user_id}/chat endpoint in backend/src/api/chat.py
-- [ ] T023 [US1] Add chat router to main.py routes in backend/src/main.py
-- [ ] T024 [US1] Run tests and verify add_task flow works end-to-end
+- [x] T020 [US1] Implement add_task MCP tool in backend/src/mcp/tools.py
+- [x] T021 [US1] Create ChatService with OpenAI Agents SDK integration in backend/src/services/chat_service.py
+- [x] T022 [US1] Implement POST /api/{user_id}/chat endpoint in backend/src/api/chat.py
+- [x] T023 [US1] Add chat router to main.py routes in backend/src/main.py
+- [x] T024 [US1] Run tests and verify add_task flow works end-to-end
 
 **Checkpoint**: User Story 1 complete - Users can add tasks via chat
 
@@ -101,14 +101,14 @@
 
 ### Tests for User Story 2
 
-- [ ] T025 [P] [US2] Write unit test for list_tasks MCP tool in backend/tests/test_mcp_tools.py
-- [ ] T026 [P] [US2] Write integration test for "List tasks" chat flow in backend/tests/test_chat_api.py
+- [x] T025 [P] [US2] Write unit test for list_tasks MCP tool in backend/tests/test_mcp_tools.py
+- [x] T026 [P] [US2] Write integration test for "List tasks" chat flow in backend/tests/test_chat_api.py
 
 ### Implementation for User Story 2
 
-- [ ] T027 [US2] Implement list_tasks MCP tool with status filter in backend/src/mcp/tools.py
-- [ ] T028 [US2] Update ChatService to handle list_tasks responses in backend/src/services/chat_service.py
-- [ ] T029 [US2] Run tests and verify list_tasks flow works end-to-end
+- [x] T027 [US2] Implement list_tasks MCP tool with status filter in backend/src/mcp/tools.py
+- [x] T028 [US2] Update ChatService to handle list_tasks responses in backend/src/services/chat_service.py
+- [x] T029 [US2] Run tests and verify list_tasks flow works end-to-end
 
 **Checkpoint**: User Stories 1 & 2 complete - Core add/view functionality working
 
@@ -122,13 +122,13 @@
 
 ### Tests for User Story 3
 
-- [ ] T030 [P] [US3] Write unit test for complete_task MCP tool in backend/tests/test_mcp_tools.py
+- [x] T030 [P] [US3] Write unit test for complete_task MCP tool in backend/tests/test_mcp_tools.py
 - [ ] T031 [P] [US3] Write integration test for "Complete task" chat flow in backend/tests/test_chat_api.py
 
 ### Implementation for User Story 3
 
-- [ ] T032 [US3] Implement complete_task MCP tool in backend/src/mcp/tools.py
-- [ ] T033 [US3] Run tests and verify complete_task flow works end-to-end
+- [x] T032 [US3] Implement complete_task MCP tool in backend/src/mcp/tools.py
+- [x] T033 [US3] Run tests and verify complete_task flow works end-to-end
 
 **Checkpoint**: User Story 3 complete - Users can complete tasks via chat
 
@@ -142,13 +142,13 @@
 
 ### Tests for User Story 4
 
-- [ ] T034 [P] [US4] Write unit test for delete_task MCP tool in backend/tests/test_mcp_tools.py
+- [x] T034 [P] [US4] Write unit test for delete_task MCP tool in backend/tests/test_mcp_tools.py
 - [ ] T035 [P] [US4] Write integration test for "Delete task" chat flow in backend/tests/test_chat_api.py
 
 ### Implementation for User Story 4
 
-- [ ] T036 [US4] Implement delete_task MCP tool in backend/src/mcp/tools.py
-- [ ] T037 [US4] Run tests and verify delete_task flow works end-to-end
+- [x] T036 [US4] Implement delete_task MCP tool in backend/src/mcp/tools.py
+- [x] T037 [US4] Run tests and verify delete_task flow works end-to-end
 
 **Checkpoint**: User Story 4 complete - Users can delete tasks via chat
 
@@ -162,13 +162,13 @@
 
 ### Tests for User Story 5
 
-- [ ] T038 [P] [US5] Write unit test for update_task MCP tool in backend/tests/test_mcp_tools.py
+- [x] T038 [P] [US5] Write unit test for update_task MCP tool in backend/tests/test_mcp_tools.py
 - [ ] T039 [P] [US5] Write integration test for "Update task" chat flow in backend/tests/test_chat_api.py
 
 ### Implementation for User Story 5
 
-- [ ] T040 [US5] Implement update_task MCP tool in backend/src/mcp/tools.py
-- [ ] T041 [US5] Run tests and verify update_task flow works end-to-end
+- [x] T040 [US5] Implement update_task MCP tool in backend/src/mcp/tools.py
+- [x] T041 [US5] Run tests and verify update_task flow works end-to-end
 
 **Checkpoint**: All 5 MCP tools complete - Full task CRUD via chat available
 
@@ -182,7 +182,7 @@
 
 ### Tests for User Story 6
 
-- [ ] T042 [P] [US6] Write unit test for ConversationService CRUD in backend/tests/test_chat_service.py
+- [x] T042 [P] [US6] Write unit test for ConversationService CRUD in backend/tests/test_conversation_service.py
 - [ ] T043 [P] [US6] Write integration test for conversation persistence in backend/tests/test_chat_api.py
 
 ### Implementation for User Story 6
@@ -206,14 +206,14 @@
 
 ### Frontend Components
 
-- [ ] T050 [P] Create chat API client in frontend/src/lib/chat-api.ts
-- [ ] T051 [P] Create useChat hook for state management in frontend/src/hooks/useChat.ts
-- [ ] T052 [P] Create ChatMessage component in frontend/src/components/ChatMessage.tsx
-- [ ] T053 [P] Create ChatInput component in frontend/src/components/ChatInput.tsx
-- [ ] T054 Create Chat component wrapper with ChatKit in frontend/src/components/Chat.tsx
-- [ ] T055 Create /chat page route in frontend/src/app/chat/page.tsx
-- [ ] T056 Add chat navigation link to dashboard in frontend/src/app/dashboard/page.tsx
-- [ ] T057 Create frontend chat component tests in frontend/tests/chat.test.tsx
+- [x] T050 [P] Create chat API client in frontend/src/lib/chat-api.ts
+- [x] T051 [P] Create useChat hook for state management in frontend/src/hooks/useChat.ts
+- [x] T052 [P] Create ChatMessage component in frontend/src/components/ChatMessage.tsx
+- [x] T053 [P] Create ChatInput component in frontend/src/components/ChatInput.tsx
+- [x] T054 Create Chat component wrapper with ChatKit in frontend/src/components/Chat.tsx
+- [x] T055 Create /chat page route in frontend/src/app/chat/page.tsx
+- [x] T056 Add chat navigation link to dashboard in frontend/src/app/dashboard/page.tsx
+- [x] T057 Create frontend chat component tests in frontend/src/__tests__/chat.test.tsx
 
 **Checkpoint**: Frontend complete - Users can interact with chatbot via web UI
 
@@ -232,9 +232,9 @@
 
 ### Error Handling & Edge Cases
 
-- [ ] T062 [P] Implement empty message validation in chat endpoint
-- [ ] T063 [P] Implement long message handling (>1000 chars)
-- [ ] T064 [P] Implement AI service unavailable error handling
+- [x] T062 [P] Implement empty message validation in chat endpoint
+- [x] T063 [P] Implement long message handling (>1000 chars)
+- [x] T064 [P] Implement AI service unavailable error handling
 - [ ] T065 [P] Implement ambiguous command clarification (ask user to specify)
 
 ### Documentation

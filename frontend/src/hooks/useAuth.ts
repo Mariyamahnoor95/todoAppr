@@ -56,7 +56,9 @@ export function useAuth() {
             setUser({
               id: session.user.id,
               email: session.user.email,
-              created_at: session.user.createdAt,
+              created_at: session.user.createdAt instanceof Date
+                ? session.user.createdAt.toISOString()
+                : String(session.user.createdAt),
             });
             // Fetch JWT token for backend API calls
             await fetchAndStoreToken();
@@ -91,7 +93,9 @@ export function useAuth() {
         setUser({
           id: data.user.id,
           email: data.user.email,
-          created_at: data.user.createdAt,
+          created_at: data.user.createdAt instanceof Date
+            ? data.user.createdAt.toISOString()
+            : String(data.user.createdAt),
         });
         // Fetch JWT token for backend API calls
         await fetchAndStoreToken();
@@ -123,7 +127,9 @@ export function useAuth() {
         setUser({
           id: data.user.id,
           email: data.user.email,
-          created_at: data.user.createdAt,
+          created_at: data.user.createdAt instanceof Date
+            ? data.user.createdAt.toISOString()
+            : String(data.user.createdAt),
         });
         // Fetch JWT token for backend API calls
         await fetchAndStoreToken();

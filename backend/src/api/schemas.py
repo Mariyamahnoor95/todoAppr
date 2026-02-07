@@ -228,3 +228,114 @@ class TaskListResponse(BaseModel):
             ]
         }
     }
+
+
+# Chat Schemas (Phase III)
+
+
+class ToolCallResponse(BaseModel):
+    """Response schema for MCP tool call results."""
+
+    tool: str = Field(..., description="Name of the MCP tool invoked")
+    result: dict = Field(..., description="Result from the tool execution")
+
+
+class ChatRequest(BaseModel):
+    """Request schema for chat endpoint."""
+
+    conversation_id: UUID | None = Field(
+        None, description="Existing conversation ID. If not provided, a new conversation is created."
+    )
+    message: str = Field(
+        ..., min_length=1, max_length=1000, description="User's natural language message"
+    )
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "message": "Add a task to buy groceries",
+                },
+                {
+                    "conversation_id": "550e8400-e29b-41d4-a716-446655440000",
+                    "message": "Show me all my tasks",
+                },
+            ]
+        }
+    }
+
+
+class ChatResponse(BaseModel):
+    """Response schema for chat endpoint."""
+
+    conversation_id: UUID = Field(..., description="The conversation ID (new or existing)")
+    response: str = Field(..., description="AI assistant's response message")
+    tool_calls: list[ToolCallResponse] = Field(
+        default_factory=list, description="List of MCP tools invoked during processing"
+    )
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "conversation_id": "550e8400-e29b-41d4-a716-446655440000",
+                    "response": "I've added 'Buy groceries' to your tasks.",
+                    "tool_calls": [
+                        {
+                            "tool": "add_task",
+                            "result": {
+                                "task_id": "123e4567-e89b-12d3-a456-426614174000",
+                                "status": "created",
+                                "title": "Buy groceries",
+                            },
+                        }
+                    ],
+                }
+            ]
+        }
+    }
+
+
+class ConversationMessageResponse(BaseModel):
+    """Response schema for a conversation message."""
+
+    id: UUID = Field(..., description="Message unique identifier")
+    role: str = Field(..., description="Message sender role (user or assistant)")
+    content: str = Field(..., description="Message content")
+    created_at: datetime = Field(..., description="Message creation timestamp")
+
+    model_config = {"from_attributes": True}
+
+
+class ConversationSummaryResponse(BaseModel):
+    """Response schema for conversation list item."""
+
+    id: UUID = Field(..., description="Conversation unique identifier")
+    created_at: datetime = Field(..., description="Conversation creation timestamp")
+    updated_at: datetime = Field(..., description="Conversation last update timestamp")
+    message_count: int = Field(default=0, description="Number of messages in conversation")
+    last_message_preview: str | None = Field(
+        None, description="Preview of last message (max 100 chars)"
+    )
+
+
+class ConversationListResponse(BaseModel):
+    """Response schema for conversation list."""
+
+    conversations: list[ConversationSummaryResponse] = Field(
+        ..., description="List of conversations"
+    )
+    total: int = Field(..., description="Total number of conversations")
+    limit: int = Field(..., description="Maximum number returned")
+    offset: int = Field(..., description="Number of conversations skipped")
+
+
+class ConversationDetailResponse(BaseModel):
+    """Response schema for conversation with messages."""
+
+    id: UUID = Field(..., description="Conversation unique identifier")
+    created_at: datetime = Field(..., description="Conversation creation timestamp")
+    updated_at: datetime = Field(..., description="Conversation last update timestamp")
+    messages: list[ConversationMessageResponse] = Field(
+        ..., description="Messages in the conversation"
+    )

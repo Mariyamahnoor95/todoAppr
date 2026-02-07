@@ -32,14 +32,19 @@ async function fetchApi<T>(endpoint: string, options: RequestInit = {}): Promise
   const { useAuthStore } = await import("@/lib/store");
   const token = useAuthStore.getState().token;
 
-  const headers: HeadersInit = {
+  const headers: Record<string, string> = {
     "Content-Type": "application/json",
-    ...options.headers,
   };
 
   // Add Authorization header with JWT token
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  // Merge any additional headers from options
+  if (options.headers) {
+    const optHeaders = options.headers as Record<string, string>;
+    Object.assign(headers, optHeaders);
   }
 
   const response = await fetch(url, {

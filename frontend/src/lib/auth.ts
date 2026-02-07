@@ -25,13 +25,10 @@ export const auth = betterAuth({
   plugins: [
     jwt({
       jwt: {
-        expiresIn: 60 * 60 * 24 * 7, // 7 days
+        expirationTime: "7d", // 7 days
       },
     }),
   ],
-  advanced: {
-    generateId: () => crypto.randomUUID(),
-  },
 });
 
 export type Session = typeof auth.$Infer.Session;
