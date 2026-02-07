@@ -1,8 +1,19 @@
 """
 Chat service for AI-powered task management conversations.
 
-Orchestrates conversation management, OpenAI agent execution, and MCP tool calls.
+Orchestrates conversation management, AI agent execution, and MCP tool calls.
 Implements stateless architecture - all state is stored in the database.
+
+Supports multiple AI providers via OpenAI-compatible API:
+- OpenAI (default)
+- Groq (free tier available)
+- Ollama (local, free)
+- OpenRouter (many free models)
+
+Configure via environment variables:
+- OPENAI_API_KEY: API key for the provider
+- OPENAI_API_BASE: Base URL (optional, for alternative providers)
+- CHAT_MODEL: Model name (default: gpt-4o)
 """
 
 import json
@@ -82,18 +93,27 @@ class ChatService:
     def __init__(
         self,
         history_limit: int = 20,
-        model: str = "gpt-4o",
     ):
         """
         Initialize chat service.
 
         Args:
             history_limit: Maximum messages to include in context
-            model: OpenAI model to use for chat
+
+        Environment variables:
+            OPENAI_API_KEY: API key for the AI provider
+            OPENAI_API_BASE: Base URL for alternative providers (optional)
+            CHAT_MODEL: Model to use (default: gpt-4o)
         """
         self.conversation_service = ConversationService(history_limit=history_limit)
-        self.model = model
-        self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        self.model = os.getenv("CHAT_MODEL", "gpt-4o")
+
+        # Support alternative AI providers via OpenAI-compatible API
+        api_base = os.getenv("OPENAI_API_BASE")
+        self.client = OpenAI(
+            api_key=os.getenv("OPENAI_API_KEY"),
+            base_url=api_base if api_base else None,
+        )
         self.tools = get_mcp_tools()
 
     async def process_message(
